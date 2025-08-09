@@ -9,8 +9,6 @@ export const JWT_SECRET = (() => {
     }
     return process.env.JWT_SECRET;
 })();
-//export const JWT_SECRET = process.env.JWT_SECRET;
-//import guard from '../../Guards/guard.js';
 import { authGuard } from '../../Guards/guards.js';
 import User from '../schemas/User.js';
 const router = Router();
@@ -21,7 +19,6 @@ router.post('/login', async (req, res, next) => {
         const err = new Error(error.details[0].message);
         err.status = 400;
         return next(err);
-        // return res.status(400).send({ message: error.details[0].message });
     }
     const { email, password } = req.body;
 
@@ -31,27 +28,36 @@ router.post('/login', async (req, res, next) => {
         const error = new Error("email or password incorrect");
         error.status = 403;
         return next(error);
-        // return res.status(403).send({ message: "email or password incorrect" });
+    }
+    if (userFind.lockUntil && userFind.lockUntil > Date.now()) {
+        const err = new Error("Account is locked. Try again later.After : " + userFind.lockUntil);
+        err.status = 403;
+        return next(err);
     }
 
     const passwordMatch = await bcrypt.compare(password, userFind.password);
 
     if (!passwordMatch) {
+        userFind.loginAttempts += 1;
+        if (userFind.loginAttempts >= 3) {
+            userFind.lockUntil = Date.now() + 24 * 60 * 60 * 1000;
+            userFind.loginAttempts = 0;
+        }
+        await userFind.save();
         const error = new Error("email or password incorrect");
         error.status = 403;
         return next(error);
-        // return res.status(403).send({ message: "email or password incorrect" });
     }
-
+    userFind.loginAttempts = 0;
+    userFind.lockUntil = null;
+    await userFind.save();
     const obj = {
         _id: userFind._id,
         isBusiness: userFind.isBusiness,
         isAdmin: userFind.isAdmin,
         fullName: `${userFind.firstName} ${userFind.lastName}`,
     };
-
     const token = jwt.sign(obj, JWT_SECRET, { expiresIn: '15m' });
-
     res.send(token);
 });
 
@@ -61,7 +67,6 @@ router.post('/', async (req, res, next) => {
         const err = new Error(error.details[0].message);
         err.status = 400;
         return next(err);
-        //   return res.status(400).send({ message: error.details[0].message });
     }
     const {
         name: { first, middle, last },
@@ -79,7 +84,6 @@ router.post('/', async (req, res, next) => {
         const error = new Error("email is used");
         error.status = 403;
         return next(error);
-        //   return res.status(403).send({ message: "email is used" });
     }
 
     const user = new User({

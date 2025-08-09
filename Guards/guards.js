@@ -1,7 +1,6 @@
-// guards.js
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from '../handlers/user/auth.js';
-import Card from '../handlers/schemas/Card.js'; // Make sure path is correct
+import Card from '../handlers/schemas/Card.js';
 
 // Utility: decode token and attach req.user
 const verifyToken = (req, next) => {

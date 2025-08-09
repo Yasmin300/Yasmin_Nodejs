@@ -10,18 +10,18 @@ const AddressSchema = new mongoose.Schema({
         type: Number,
         default: 0
     }
-}, { _id: true });  // <-- adds _id to address subdocument
+}, { _id: true });
 
 const ImageSchema = new mongoose.Schema({
     url: String,
     alt: String
-}, { _id: true });  // <-- adds _id to image subdocument
+}, { _id: true });
 
 const NameSchema = new mongoose.Schema({
     first: String,
     middle: String,
     last: String
-}, { _id: true });  // <-- adds _id to image subdocument
+}, { _id: true });
 
 const UserSchema = new mongoose.Schema({
     name: NameSchema,
@@ -42,6 +42,13 @@ const UserSchema = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now
+    },
+    loginAttempts: {
+        type: Number,
+        default: 0
+    },
+    lockUntil: {
+        type: Date
     }
 });
 

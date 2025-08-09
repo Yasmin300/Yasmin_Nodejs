@@ -5,7 +5,6 @@ import cors from 'cors';
 import userRoutes from './handlers/user/index.js';
 import cardRoutes from './handlers/card/index.js';
 import insertInitialData from './handlers/InitialData.js';
-import logger from './filelogger.js';
 import morgan from 'morgan';
 import path from 'path';
 import fs from 'fs';
@@ -17,7 +16,6 @@ try {
     console.error('❌ MongoDB connection error:', err);
     process.exit(1);
 }
-
 
 const app = express();
 app.use(express.json());
@@ -34,11 +32,9 @@ app.get("/test-error", (req, res, next) => {
     res.status(400);
     next(new Error("Simulated error"));
 });
-//app.use(logger);
 app.use("/users", userRoutes);
 app.use('/cards', cardRoutes);
 
-// ✅ Custom error logger
 app.use((err, req, res, next) => {
     const status = err.status || 500;
 
@@ -61,10 +57,9 @@ app.use((err, req, res, next) => {
         }
     });
 
-    next(err); // Pass to final error handler
+    next(err);
 });
 
-// ✅ Final error handler
 app.use((err, req, res, next) => {
     const status = err.status || 500;
     res.status(status).json({ message: err.message || "Unknown error" });

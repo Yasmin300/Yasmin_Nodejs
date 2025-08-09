@@ -17,7 +17,6 @@ router.get('/:id', userAdminGuard, async (req, res, next) => {
             const error = new Error("User not found");
             error.status = 404;
             return next(error);
-            //return res.status(404).send({ message: "User not found" });
         }
 
         res.send(user);
@@ -25,7 +24,6 @@ router.get('/:id', userAdminGuard, async (req, res, next) => {
         const error = new Error("Invalid user ID");
         error.status = 400;
         return next(error);
-        //  res.status(400).send({ message: "Invalid user ID" });
     }
 });
 router.delete('/:id', userAdminGuard, async (req, res, next) => {
@@ -36,17 +34,12 @@ router.delete('/:id', userAdminGuard, async (req, res, next) => {
             const error = new Error("User not found");
             error.status = 404;
             return next(error);
-            //return res.status(404).send({ message: "User not found" });
         }
         res.send({ message: "User deleted successfully", user });
     } catch (err) {
         const error = new Error("Error deleting user" + err.message);
         error.status = 500;
         return next(error);
-        //  res.status(500).send({
-        ///    message: "Error deleting user",
-        //    error: err.message
-        //  });
     }
 });
 router.put('/:id', userGuard, async (req, res, next) => {
@@ -55,14 +48,12 @@ router.put('/:id', userGuard, async (req, res, next) => {
         const error = new Error("User not found");
         error.status = 400;
         return next(error);
-        //return res.status(400).send({ message: "User not found" });
     }
     const { err } = editSchema.validate(req.body);
     if (err) {
         const error = new Error(err.details[0].message);
         error.status = 400;
         return next(error);
-        //  return res.status(400).send({ message: error.details[0].message });
     }
     const {
         name: { first, middle, last },
@@ -101,7 +92,6 @@ router.put('/:id', userGuard, async (req, res, next) => {
         const error = new Error("Error updating user" + err.message);
         error.status = 400;
         return next(error);
-        //  res.status(400).send({ message: "Error updating user", error: err.message });
     }
 });
 router.patch('/:id', userGuard, async (req, res, next) => {
@@ -110,7 +100,6 @@ router.patch('/:id', userGuard, async (req, res, next) => {
         const error = new Error("User not found");
         error.status = 400;
         return next(error);
-        // return res.status(400).send({ message: "User not found" });
     }
     user.isBusiness = !user.isBusiness;
     try {
@@ -121,7 +110,6 @@ router.patch('/:id', userGuard, async (req, res, next) => {
         const error = new Error("Error updating user's business status" + err.message);
         error.status = 400;
         return next(error);
-        //  res.status(400).send({ message: "Error updating user's business status", error: err.message });
     }
 });
 export default router;

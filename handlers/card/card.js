@@ -90,9 +90,9 @@ router.post('/', businessGuard, async (req, res, next) => {
         }
         const bizNumber = await generateUniqueBizNumber();
         const card = new Card({
-            ...req.body, // title, subtitle, address, etc.
+            ...req.body,
             bizNumber,
-            user_id: req.user._id,  // set by guard middleware
+            user_id: req.user._id,
             likes: []
         });
         const newCard = await card.save();
@@ -117,7 +117,6 @@ router.delete('/:id', cardOwnerOrAdminGuard, async (req, res, next) => {
             error.status = 403;
             return next(error);
         }
-        // res.send({ message: "Card deleted successfully", user: req.user });
         res.send(card);
     } catch (err) {
         const error = new Error("Error deleting card" + err.message);
@@ -179,7 +178,6 @@ router.patch('/:id', authGuard, async (req, res, next) => {
             card.likes.splice(index, 1);
         }
         await card.save();
-        //res.send({ message: "Card like status updated", likes: card.likes });
         res.send(card);
     }
     catch (err) {
